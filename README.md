@@ -1,8 +1,7 @@
-
-[![Ruller](https://img.shields.io/badge/TxtAndPDFReader -1.0.0-ff69b4.svg)](https://github.com/LSSSSL/LSSPieChart)
-[![Author](https://img.shields.io/badge/author-LSSSSL-yellowgreen.svg)](https://github.com/LSSSSL)
-
 # TxtAndPDFReader 
+
+[![TxtAndPDFReader](https://img.shields.io/badge/TxtAndPDFReader -1.0.0-ff69b4.svg)
+[![Author](https://img.shields.io/badge/author-LSSSSL-yellowgreen.svg)](https://github.com/LSSSSL)
 
 电子书阅读器，支持txt，pdf格式 （txt 借鉴 ：https://github.com/GGGHub/Reader  进行了部分修改）
 
