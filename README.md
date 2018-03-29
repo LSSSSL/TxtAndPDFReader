@@ -1,4 +1,5 @@
 
+[![Ruller](https://img.shields.io/badge/TxtAndPDFReader -1.0.0-ff69b4.svg)](https://github.com/LSSSSL/LSSPieChart)
 [![Author](https://img.shields.io/badge/author-LSSSSL-yellowgreen.svg)](https://github.com/LSSSSL)
 
 # TxtAndPDFReader 
