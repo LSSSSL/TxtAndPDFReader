@@ -1,6 +1,6 @@
 # TxtAndPDFReader 
 
-iOS基于CoreText实现的电子书阅读器，支持txt，pdf格式 （txt 借鉴 ：https://github.com/GGGHub/Reader）
+电子书阅读器，支持txt，pdf格式 （txt 借鉴 ：https://github.com/GGGHub/Reader  进行了部分修改）
 
 ## 用法
 
