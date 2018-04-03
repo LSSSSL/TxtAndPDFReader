@@ -40,51 +40,69 @@
     _srcollView.scrollEnabled = YES;
     _srcollView.frame = self.view.frame;
     UIImage *img = [self drawInContextAtPageNo:(int)self.pageNO];
-    _imageView = [[UIImageView alloc]initWithImage:img];
+    CGSize imageSize= [self DrawInRect:img.size WithSize:_srcollView.bounds.size];
+    _imageView = [[UIImageView alloc]initWithFrame:CGRectMake((_srcollView.bounds.size.width-imageSize.width)/2,(_srcollView.bounds.size.height-imageSize.height)/2,imageSize.width,imageSize.height)];
+    _imageView.image = img;
     //设置这个_imageView能被缩放的最大尺寸，这句话很重要，一定不能少,如果没有这句话，图片不能缩放
-    _imageView.frame = CGRectMake(0, 0, _imageView.image.size.width, _imageView.image.size.height);
+    _imageView.frame =CGRectMake((self.view.bounds.size.width-imageSize.width)/2,(self.view.bounds.size.height-imageSize.height)/2,imageSize.width,imageSize.height);
     _srcollView.contentSize=_imageView.frame.size;
     [self.view addSubview:_srcollView];
     [_srcollView addSubview:_imageView];
-    
     [_srcollView setMinimumZoomScale:minScale];
     [_srcollView setMaximumZoomScale:maxScale];
     [_srcollView setZoomScale:minScale animated:NO];
 }
 -(UIImage *)drawInContextAtPageNo:(int)page_no{
-    //开始图像绘图
-    UIGraphicsBeginImageContext(self.view.bounds.size);
-    //获取当前CGContextRef
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGContextTranslateCTM(context, 0.0, self.view.frame.size.height);
-    CGContextScaleCTM(context, 1.0, -1.0);
     if (_pageNO == 0) {
         _pageNO = 1;
     }
     CGPDFPageRef page = CGPDFDocumentGetPage(_pdfDocument, _pageNO);
-    CGContextSaveGState(context);
-    CGAffineTransform pdfTransform = CGPDFPageGetDrawingTransform(page, kCGPDFCropBox, self.view.bounds, 0, true);
-    CGContextConcatCTM(context, pdfTransform);
-    CGContextDrawPDFPage(context, page);
-    CGContextRestoreGState(context);
-    UIImage *img = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return img;
+    CGRect pageRect = CGPDFPageGetBoxRect(page, kCGPDFMediaBox);
+    UIGraphicsBeginImageContext(pageRect.size);
+    CGContextRef imgContext = UIGraphicsGetCurrentContext();
+    CGContextSaveGState(imgContext);
+    CGContextTranslateCTM(imgContext, 0.0, pageRect.size.height);
+    CGContextScaleCTM(imgContext,  1.0,-1.0);
+    CGContextSetInterpolationQuality(imgContext, kCGInterpolationHigh);
+    CGContextSetRenderingIntent(imgContext, kCGRenderingIntentDefault);
+    CGContextDrawPDFPage(imgContext, page);
+    CGContextRestoreGState(imgContext);
+    UIImage *tempImage = UIGraphicsGetImageFromCurrentImageContext();
+    return tempImage;
+}
+//根据屏幕大小 按比例绘画
+-(CGSize )DrawInRect:(CGSize)rect WithSize:(CGSize)largeSize
+{    //本身图片大小
+    CGSize imageSize = rect;
+    float width = imageSize.width;
+    float height = imageSize.height;
+    //最大展示区域
+    float targetWidth =largeSize.width;
+    float targetHeight =largeSize.height;
+    float scaledWidth = targetWidth;
+    float scaledHeight = (height / width) * scaledWidth;
+    if (scaledHeight > targetHeight)
+    {
+        float scale = targetHeight / scaledHeight;
+        scaledHeight = targetHeight;
+        scaledWidth = scale * scaledWidth;
+    }
+    return CGSizeMake(scaledWidth, scaledHeight);
 }
 
 #pragma mark - UIScrollViewDelegate
-
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
 {
     return _imageView;
 }
-//当滑动结束时
+
+//当捏合结束时
 - (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(CGFloat)scale
 {
     CGFloat offsetX = (_srcollView.bounds.size.width>_srcollView.contentSize.width)?(_srcollView.bounds.size.width-_srcollView.contentSize.width)*0.5:0.0;
     CGFloat offsetY = (_srcollView.bounds.size.height>_srcollView.contentSize.height)?(_srcollView.bounds.size.height-_srcollView.contentSize.height)*0.5:0.0;
-    
-    _imageView.center = CGPointMake(scrollView.contentSize.width*0.5+offsetX, scrollView.contentSize.height*0.5+offsetY);
+    CGPoint centers=CGPointMake(scrollView.contentSize.width*0.5+offsetX, scrollView.contentSize.height*0.5+offsetY);
+    _imageView.center =centers;
 }
 @end
 
@@ -142,7 +160,7 @@
     CFURLRef pdfUrl;
     path = CFStringCreateWithCString(NULL, [_pdfPageModel.url.path UTF8String], kCFStringEncodingUTF8);
     pdfUrl = CFURLCreateWithFileSystemPath(NULL, path, kCFURLPOSIXPathStyle, NO);
-   _pdfDocument = CGPDFDocumentCreateWithURL(pdfUrl);
+    _pdfDocument = CGPDFDocumentCreateWithURL(pdfUrl);
     CFRelease(path);
     CFRelease(pdfUrl);
     
