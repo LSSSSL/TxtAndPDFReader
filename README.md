@@ -5,6 +5,8 @@
 
 电子书阅读器，支持txt，pdf格式 （txt 借鉴 ：https://github.com/GGGHub/Reader  进行了部分修改）
 
+pdf 可通过捏合缩放 放大查看内容
+
 ## 用法
 
 1.将Reader文件夹（Resource测试资源文件）和information.bundle 拉取使用
