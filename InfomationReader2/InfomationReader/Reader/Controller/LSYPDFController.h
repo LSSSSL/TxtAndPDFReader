@@ -24,7 +24,6 @@
 +(ZPDFPageModel *)getLocalModelWithURL:(NSURL *)Url;
 @end
 
-
 #pragma mark -LSYPDFController
 @protocol LSYPDFReaderDelegate <NSObject>
 @optional
@@ -42,7 +41,6 @@
 @property (nonatomic,strong) UIColor *backColor;  //主题颜色
 @property (nonatomic,assign) float alphaValue;
 @end
-
 
 #pragma mark -PDFMenuView
 @class PDFMenuView;

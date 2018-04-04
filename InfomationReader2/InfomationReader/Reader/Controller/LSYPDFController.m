@@ -42,6 +42,7 @@
     UIImage *img = [self drawInContextAtPageNo:(int)self.pageNO];
     CGSize imageSize= [self DrawInRect:img.size WithSize:_srcollView.bounds.size];
     _imageView = [[UIImageView alloc]initWithFrame:CGRectMake((_srcollView.bounds.size.width-imageSize.width)/2,(_srcollView.bounds.size.height-imageSize.height)/2,imageSize.width,imageSize.height)];
+//    _imageView.contentMode = UIViewContentModeScaleAspectFill;
     _imageView.image = img;
     //设置这个_imageView能被缩放的最大尺寸，这句话很重要，一定不能少,如果没有这句话，图片不能缩放
     _imageView.frame =CGRectMake((self.view.bounds.size.width-imageSize.width)/2,(self.view.bounds.size.height-imageSize.height)/2,imageSize.width,imageSize.height);
@@ -57,12 +58,13 @@
         _pageNO = 1;
     }
     CGPDFPageRef page = CGPDFDocumentGetPage(_pdfDocument, _pageNO);
-    CGRect pageRect = CGPDFPageGetBoxRect(page, kCGPDFMediaBox);
+    CGRect tempRect = CGPDFPageGetBoxRect(page, kCGPDFMediaBox);
+    CGRect pageRect = CGRectMake(0, 0, tempRect.size.width*6, tempRect.size.height*6);
     UIGraphicsBeginImageContext(pageRect.size);
     CGContextRef imgContext = UIGraphicsGetCurrentContext();
     CGContextSaveGState(imgContext);
     CGContextTranslateCTM(imgContext, 0.0, pageRect.size.height);
-    CGContextScaleCTM(imgContext,  1.0,-1.0);
+    CGContextScaleCTM(imgContext,  6.0,-6.0);
     CGContextSetInterpolationQuality(imgContext, kCGInterpolationHigh);
     CGContextSetRenderingIntent(imgContext, kCGRenderingIntentDefault);
     CGContextDrawPDFPage(imgContext, page);
@@ -160,7 +162,7 @@
     CFURLRef pdfUrl;
     path = CFStringCreateWithCString(NULL, [_pdfPageModel.url.path UTF8String], kCFStringEncodingUTF8);
     pdfUrl = CFURLCreateWithFileSystemPath(NULL, path, kCFURLPOSIXPathStyle, NO);
-    _pdfDocument = CGPDFDocumentCreateWithURL(pdfUrl);
+   _pdfDocument = CGPDFDocumentCreateWithURL(pdfUrl);
     CFRelease(path);
     CFRelease(pdfUrl);
     
