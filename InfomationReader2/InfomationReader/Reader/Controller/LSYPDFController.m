@@ -59,12 +59,13 @@
     }
     CGPDFPageRef page = CGPDFDocumentGetPage(_pdfDocument, _pageNO);
     CGRect tempRect = CGPDFPageGetBoxRect(page, kCGPDFMediaBox);
-    CGRect pageRect = CGRectMake(0, 0, tempRect.size.width*6, tempRect.size.height*6);
+    int wScale =  ceil(2100.0f/tempRect.size.width);
+    CGRect pageRect = CGRectMake(0, 0, tempRect.size.width*wScale, tempRect.size.height*wScale);
     UIGraphicsBeginImageContext(pageRect.size);
     CGContextRef imgContext = UIGraphicsGetCurrentContext();
     CGContextSaveGState(imgContext);
     CGContextTranslateCTM(imgContext, 0.0, pageRect.size.height);
-    CGContextScaleCTM(imgContext,  6.0,-6.0);
+    CGContextScaleCTM(imgContext,  wScale,-wScale);
     CGContextSetInterpolationQuality(imgContext, kCGInterpolationHigh);
     CGContextSetRenderingIntent(imgContext, kCGRenderingIntentDefault);
     CGContextDrawPDFPage(imgContext, page);
