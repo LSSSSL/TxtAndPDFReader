@@ -12,3 +12,6 @@ pdf 可通过捏合缩放 放大查看内容
 1.将Reader文件夹（Resource测试资源文件）和information.bundle 拉取使用
 
 2.Build Phases -Compile Sources 设置 NSString+HTML.M 和 GTMNSString+HTML.M 两个文件不使用arc 添加 -fno-objc-arc 
+
+## 注意
+
