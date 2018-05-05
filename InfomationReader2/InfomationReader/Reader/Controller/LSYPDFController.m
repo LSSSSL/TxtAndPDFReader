@@ -20,6 +20,8 @@
 @interface ZPDFPageController ()<UIScrollViewDelegate>
 @property(nonatomic,strong)UIImageView *imageView;
 @property(nonatomic,strong)UIScrollView *srcollView;
+@property(nonatomic,strong)UIImage *pdfImage;
+-(void)ReFreshViews;
 @end
 @implementation ZPDFPageController
 - (void)viewDidLoad {
@@ -27,6 +29,16 @@
     self.view.userInteractionEnabled = YES;
     self.view.backgroundColor = [UIColor whiteColor];
     [self CreateSrcollView];
+}
+#pragma mark -刷新横竖屏
+-(void)ReFreshViews
+{
+    _srcollView.frame = self.view.frame;
+    CGSize imageSize= [self DrawInRect:_pdfImage.size WithSize:CGSizeMake(self.view.frame.size.width,self.view.frame.size.height)];
+    _imageView.frame =CGRectMake((self.view.frame.size.width-imageSize.width)/2,(self.view.frame.size.height-imageSize.height)/2,imageSize.width,imageSize.height);
+    //设置这个_imageView能被缩放的最大尺寸，这句话很重要，一定不能少,如果没有这句话，图片不能缩放
+    _imageView.frame =CGRectMake((self.view.bounds.size.width-imageSize.width)/2,(self.view.bounds.size.height-imageSize.height)/2,imageSize.width,imageSize.height);
+    _srcollView.contentSize=_imageView.frame.size;
 }
 #pragma mark -图片浏览
 -(void)CreateSrcollView
@@ -39,11 +51,11 @@
     _srcollView.scrollsToTop = NO;
     _srcollView.scrollEnabled = YES;
     _srcollView.frame = self.view.frame;
-    UIImage *img = [self drawInContextAtPageNo:(int)self.pageNO];
-    CGSize imageSize= [self DrawInRect:img.size WithSize:_srcollView.bounds.size];
+    _pdfImage = [self drawInContextAtPageNo:(int)self.pageNO];
+    CGSize imageSize= [self DrawInRect:_pdfImage.size WithSize:_srcollView.bounds.size];
     _imageView = [[UIImageView alloc]initWithFrame:CGRectMake((_srcollView.bounds.size.width-imageSize.width)/2,(_srcollView.bounds.size.height-imageSize.height)/2,imageSize.width,imageSize.height)];
 //    _imageView.contentMode = UIViewContentModeScaleAspectFill;
-    _imageView.image = img;
+    _imageView.image = _pdfImage;
     //设置这个_imageView能被缩放的最大尺寸，这句话很重要，一定不能少,如果没有这句话，图片不能缩放
     _imageView.frame =CGRectMake((self.view.bounds.size.width-imageSize.width)/2,(self.view.bounds.size.height-imageSize.height)/2,imageSize.width,imageSize.height);
     _srcollView.contentSize=_imageView.frame.size;
@@ -206,8 +218,20 @@
     })];
     _menuView = [self menuView];
     [self.view addSubview:_menuView];
+    
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(changeRotate:) name:UIApplicationDidChangeStatusBarFrameNotification object:nil];
 }
-
+- (void)changeRotate:(NSNotification*)noti {
+    if (_readerView != nil) {
+        [_readerView ReFreshViews];
+    }
+    if (_menuView != nil) {
+        [_menuView removeFromSuperview];
+        _menuView = nil;
+    }
+    _menuView = [self menuView];
+    [self.view addSubview:_menuView];
+}
 -(PDFMenuView *)menuView
 {
     if (!_menuView) {
@@ -298,6 +322,7 @@
             }
         }
     }
+    [_readerView ReFreshViews];
     _pdfPageModel.pageNO = _readerView.pageNO;
 }
 -(void)menuViewBack
@@ -341,6 +366,7 @@
                 [_delegate LSYPDFReaderAfterViewController:_readerView WithIndex:_readerView.pageNO];
             }
         }
+        [_readerView ReFreshViews];
         return _readerView;
     }
     return nil;
@@ -377,6 +403,7 @@
                 [_delegate LSYPDFReaderAfterViewController:_readerView WithIndex:_readerView.pageNO];
             }
         }
+        [_readerView ReFreshViews];
         return _readerView;
     }
     return nil;
@@ -393,6 +420,7 @@
     else{
         _pdfPageModel.pageNO = _readerView.pageNO;
     }
+    [_readerView ReFreshViews];
 }
 
 - (NSUInteger)indexOfViewController:(ZPDFPageController *)viewController {

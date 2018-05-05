@@ -257,8 +257,6 @@
     _readView.type = ReaderTxt;
     _readView.content = [_model.chapters[chapter] stringOfPage:page];
     _readView.delegate = self;
-    NSLog(@"_readGreate");
-    
     return _readView;
 }
 -(void)updateReadModelWithChapter:(NSUInteger)chapter page:(NSUInteger)page
