@@ -33,11 +33,12 @@
 #pragma mark -刷新横竖屏
 -(void)ReFreshViews
 {
-    _srcollView.frame = self.view.frame;
+    _srcollView.frame =  self.view.frame;
     CGSize imageSize= [self DrawInRect:_pdfImage.size WithSize:CGSizeMake(self.view.frame.size.width,self.view.frame.size.height)];
-    _imageView.frame =CGRectMake((self.view.frame.size.width-imageSize.width)/2,(self.view.frame.size.height-imageSize.height)/2,imageSize.width,imageSize.height);
-    //设置这个_imageView能被缩放的最大尺寸，这句话很重要，一定不能少,如果没有这句话，图片不能缩放
-    _imageView.frame =CGRectMake((self.view.bounds.size.width-imageSize.width)/2,(self.view.bounds.size.height-imageSize.height)/2,imageSize.width,imageSize.height);
+    CGRect frame = CGRectMake((self.view.frame.size.width-imageSize.width)/2,(self.view.frame.size.height-imageSize.height)/2,imageSize.width,imageSize.height);
+    [UIView animateWithDuration:0.5 animations:^{
+        _imageView.frame =frame;
+    }];
     _srcollView.contentSize=_imageView.frame.size;
 }
 #pragma mark -图片浏览
@@ -54,7 +55,6 @@
     _pdfImage = [self drawInContextAtPageNo:(int)self.pageNO];
     CGSize imageSize= [self DrawInRect:_pdfImage.size WithSize:_srcollView.bounds.size];
     _imageView = [[UIImageView alloc]initWithFrame:CGRectMake((_srcollView.bounds.size.width-imageSize.width)/2,(_srcollView.bounds.size.height-imageSize.height)/2,imageSize.width,imageSize.height)];
-//    _imageView.contentMode = UIViewContentModeScaleAspectFill;
     _imageView.image = _pdfImage;
     //设置这个_imageView能被缩放的最大尺寸，这句话很重要，一定不能少,如果没有这句话，图片不能缩放
     _imageView.frame =CGRectMake((self.view.bounds.size.width-imageSize.width)/2,(self.view.bounds.size.height-imageSize.height)/2,imageSize.width,imageSize.height);
