@@ -219,7 +219,23 @@
     _menuView = [self menuView];
     [self.view addSubview:_menuView];
     
+    //进来时设置屏幕可以多方向旋转
+    [self interfaceOrientation:UIInterfaceOrientationPortraitUpsideDown];
+    
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(changeRotate:) name:UIApplicationDidChangeStatusBarFrameNotification object:nil];
+}
+- (void)interfaceOrientation:(UIInterfaceOrientation)orientation
+{
+    if ([[UIDevice currentDevice] respondsToSelector:@selector(setOrientation:)]) {
+        SEL selector = NSSelectorFromString(@"setOrientation:");
+        NSInvocation *invocation = [NSInvocation invocationWithMethodSignature:[UIDevice instanceMethodSignatureForSelector:selector]];
+        [invocation setSelector:selector];
+        [invocation setTarget:[UIDevice currentDevice]];
+        int val = orientation;
+        // 从2开始是因为0 1 两个参数已经被selector和target占用
+        [invocation setArgument:&val atIndex:2];
+        [invocation invoke];
+    }
 }
 - (void)changeRotate:(NSNotification*)noti {
     if (_readerView != nil) {
@@ -327,7 +343,12 @@
 }
 -(void)menuViewBack
 {
+    //返回记录上一次浏览的位置
     [ZPDFPageModel updateLocalModel:_pdfPageModel url:url];
+    //返回将通知移除
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    //返回强制为竖屏
+    [self interfaceOrientation:UIInterfaceOrientationPortrait];
 }
 #pragma mark -UIPageViewControllerDelegate,UIPageViewControllerDataSource
 //翻页控制器进行向前翻页动作 这个数据源方法返回的视图控制器为要显示视图的视图控制器
